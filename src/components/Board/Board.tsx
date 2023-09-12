@@ -3,7 +3,8 @@ import Square from "../Square/Square";
 
 interface SquareProps {
   xIsNext: boolean;
-  squares: any
+  // squares: Array<null>;
+  squares: any;
   onPlay: any;
 }
 
@@ -26,7 +27,6 @@ export default function Board(props: SquareProps) {
 
   const winner = calculateWinner(props.squares);
   const status = winner ? "Ganador: " + winner : "Siguiente jugador: " + (props.xIsNext ? "X" : "O");
-
   // let status;
   // if (winner) {
   //   status = "Ganador: " + winner;
@@ -34,32 +34,33 @@ export default function Board(props: SquareProps) {
   //   status = "Siguiente jugador: " + (xIsNext ? "X" : "O");
   // }
 
+  // Crear el tablero
+  // const rows = [0, 1, 2];
+  // rows.map(...)
+  const board = Array(3)
+    .fill(null)
+    .map((_, row) => (
+      <div key={row} className="board-row">
+        {Array(3)
+          .fill(null)
+          .map((_, col) => {
+            const squareIndex = row * 3 + col;
+            return (
+              <Square
+                key={squareIndex}
+                value={props.squares[squareIndex]}
+                onSquareClick={() => handleClick(squareIndex)}
+              />
+            );
+          })}
+      </div>
+    ));
 
-  // const [cosa, setCosa] = useState('');
 
   return (
     <>
       <div className="status">{status}</div>
-      <div className="board-row">
-        {/* <Square value="1" cosa="asdf" />
-        {Square({ value: '1', cosa: 'asdf' })} */}
-
-        {/* <Square value={squares[1]} onSquareClick={handleClick(0)} /> --> bucle infinito */}
-
-        <Square value={props.squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={props.squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={props.squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={props.squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={props.squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={props.squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={props.squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={props.squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={props.squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
+      {board}
     </>
   )
 }
