@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react"
 import { PokemonListResponse, getPokemonList } from "../../api/getPokemonList";
+import { PokemonDetailResponse, getPokemonDetail } from "../../api/getPokemonDetail";
 
 export default function Pokedex() {
     const [data, setData] = useState<PokemonListResponse>();
-    const [page, setPage] = useState(60);
+    const [page, setPage] = useState(0);
+    const [detail, setDetail] = useState<PokemonDetailResponse>();
 
     const updatePokemonList = async (page: number) => {
         const response = await getPokemonList(page);
         setData(response);
+    }
+
+    const showPokemonDetail = async (url: string) => {
+        const response = await getPokemonDetail(url);
+        setDetail(response);
     }
 
     // Se ejecuta despues de un render si hay cambios en su array de dependencias 
@@ -36,20 +43,29 @@ export default function Pokedex() {
         setPage(page + 1);
     }
 
+    console.log('Mostrar detalle', detail);
+
     return (
         <>
             <ul>
                 {data.results.map((pokemon, index) =>
-                    <li key={pokemon.name}>#{(page * 20) + index + 1} {pokemon.name}</li>)
+                    <li onClick={() => showPokemonDetail(pokemon.url)} key={pokemon.name}>#{(page * 20) + index + 1} {pokemon.name} </li>)
                 }
             </ul>
+            {/* {React.createElement('ul', {},
+                data?.results.map(pokemon => React.createElement('li', {}, pokemon.name))
+            )} */}
 
             <button onClick={goPrev} disabled={isFirstPage}>Prev</button>
             <button onClick={goNext} disabled={isLastPage}>Next</button>
 
-            {/* {React.createElement('ul', {},
-                data?.results.map(pokemon => React.createElement('li', {}, pokemon.name))
-            )} */}
+            <div>
+                {detail?.abilities?.map((ability) =>
+                    <p key={ability.ability.name}>{ability.ability.name}</p>
+                )
+                }
+            </div>
+
 
             {/* 
             Para poder pintar un JSON en el html en un componente de react
