@@ -1,10 +1,11 @@
-import { useState } from "react";
 import './Square.css'
 
 interface SquareProps {
   value: string | number;
-  onSquareClick: any
-  cosa?: any;
+  onSquareClick: any;
+  isHighlighted?: boolean;
+  disabled?: boolean;
+  // cosa?: any;
 }
 
 export default function Square(props: SquareProps) {
@@ -13,8 +14,10 @@ export default function Square(props: SquareProps) {
   return (
     <>
       <button
+        style={{ background: props.isHighlighted ? 'lightgreen' : '' }}
         className="Square-container"
         onClick={props.onSquareClick}
+        disabled={props.disabled}
       >
         {props.value}
       </button>

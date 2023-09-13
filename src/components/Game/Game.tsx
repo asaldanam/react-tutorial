@@ -3,7 +3,7 @@ import Board from "../Board/Board";
 
 export default function Game() {
   // Guardar en el estado la matriz de 9 elementos
-  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [history, setHistory] = useState<number[] | null[] | any[]>([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [ascendingOrder, setAscendingOrder] = useState(true); // Estado para controlar el orden ascendente/descendente
   const xIsNext = currentMove % 2 === 0;

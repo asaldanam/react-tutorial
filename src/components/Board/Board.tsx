@@ -3,30 +3,42 @@ import Square from "../Square/Square";
 
 interface SquareProps {
   xIsNext: boolean;
-  // squares: Array<null>;
-  squares: any;
+  squares: Array<string | null>;
   onPlay: any;
 }
 
 export default function Board(props: SquareProps) {
+  const [winningLine, setWinningLine] = useState<number[]>([])
+  const [winner, setWinner] = useState<null | 'X' | 'O'>(null);
+
   function handleClick(i: number) {
-    if (props.squares[i] || calculateWinner(props.squares)) {
-      return;
-    }
+    // [...props.squares] solo copia las propiedades inmediatas, pero matiene las referencias en las profundas
+    const nextSquares = structuredClone(props.squares);
+    nextSquares[i] = props.xIsNext ? 'X' : 'O';
 
-    const nextSquares = props.squares.slice();
+    const { winner, line } = calculateWinner(nextSquares);
 
-    if (props.xIsNext) {
-      nextSquares[i] = "X";
-    } else {
-      nextSquares[i] = "O";
-    }
+    if (winner) setWinner(winner)
+    if (line) setWinningLine(line);
 
+    if (props.squares[i]) return;
     props.onPlay(nextSquares);
+
+    console.log(props.squares)
   }
 
-  const winner = calculateWinner(props.squares);
-  const status = winner ? "Ganador: " + winner : "Siguiente jugador: " + (props.xIsNext ? "X" : "O");
+  function haveNoMoreMovements() {
+    if (!props.squares.includes(null)) {
+      return true;
+    }
+  }
+
+  const status =
+    winner
+      ? 'Ganador: ' + winner
+      : haveNoMoreMovements()
+        ? 'El resultado fue un empate'
+        : 'Siguiente jugador: ' + (props.xIsNext ? "X" : "O");
   // let status;
   // if (winner) {
   //   status = "Ganador: " + winner;
@@ -37,6 +49,7 @@ export default function Board(props: SquareProps) {
   // Crear el tablero
   // const rows = [0, 1, 2];
   // rows.map(...)
+
   const board = Array(3)
     .fill(null)
     .map((_, row) => (
@@ -44,11 +57,14 @@ export default function Board(props: SquareProps) {
         {Array(3)
           .fill(null)
           .map((_, col) => {
+
             const squareIndex = row * 3 + col;
             return (
               <Square
+                disabled={!!winner}
+                isHighlighted={winningLine.includes(squareIndex)}
                 key={squareIndex}
-                value={props.squares[squareIndex]}
+                value={props.squares[squareIndex.toString()]}
                 onSquareClick={() => handleClick(squareIndex)}
               />
             );
@@ -56,14 +72,16 @@ export default function Board(props: SquareProps) {
       </div>
     ));
 
+  // console.log({ winner, winningLine })
 
   return (
     <>
-      <div className="status">{status}</div>
+      <h3 className="status">{status}</h3>
       {board}
     </>
   )
 }
+
 
 function calculateWinner(squares: any) {
   const lines = [
@@ -78,14 +96,20 @@ function calculateWinner(squares: any) {
   ];
 
   for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
+    const line = lines[i];
+    const [a, b, c] = line;
+
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      const winner = squares[a];
+
+      return { winner, line };
     }
   }
 
-  return null;
+  return {};
 }
+
+
 
 //FORMAS DE PROVOCAR BUCLES INFINITOS
 
